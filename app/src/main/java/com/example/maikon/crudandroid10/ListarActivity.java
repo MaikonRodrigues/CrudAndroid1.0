@@ -7,6 +7,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,24 +26,30 @@ import org.json.JSONObject;
 public class ListarActivity extends AppCompatActivity implements Response.Listener<JSONObject>, Response.ErrorListener {
 
     TextView cpf, nome, endereco, telefone;
-    Button butBuscar;
-    EditText pegaCpf;
+    Button butBuscar, btnEditar;
+    EditText pegaCpf, cpfEdit, nomeEdit, enderecoEdit, telefEdit;
     ProgressDialog    progresso;
     RequestQueue request;
     JsonObjectRequest jsonObjectReq;
+    RelativeLayout layout001, layout002, layout003,layout01, layout02, layout03;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listar);
 
-        cpf      = (TextView) findViewById(R.id.textViewCpf);
-        nome     = (TextView) findViewById(R.id.textViewNome);
-        endereco = (TextView) findViewById(R.id.textViewEndereco);
-        telefone = (TextView) findViewById(R.id.textViewTelef);
+        cpf      = (TextView) findViewById(R.id.textViewCpf);       cpfEdit      = (EditText) findViewById(R.id.editTextCpf);
+        nome     = (TextView) findViewById(R.id.textViewNome);      nomeEdit     = (EditText) findViewById(R.id.editTextNome);
+        endereco = (TextView) findViewById(R.id.textViewEndereco);  enderecoEdit = (EditText) findViewById(R.id.editTextEndereco);
+        telefone = (TextView) findViewById(R.id.textViewTelef);     telefEdit    = (EditText) findViewById(R.id.editTextTelefone);
 
         pegaCpf   = (EditText) findViewById(R.id.editTextCpf);
         butBuscar = (Button)findViewById(R.id.butBuscar);
+        btnEditar = (Button)findViewById(R.id.butEditar);
+
+        layout001 = (RelativeLayout) findViewById(R.id.layout001); layout01 = (RelativeLayout) findViewById(R.id.layout1);
+        layout002 = (RelativeLayout) findViewById(R.id.layout002); layout02 = (RelativeLayout) findViewById(R.id.layout2);
+        layout003 = (RelativeLayout) findViewById(R.id.layout003); layout03 = (RelativeLayout) findViewById(R.id.layout3);
 
         request = Volley.newRequestQueue(ListarActivity.this);
 
@@ -49,8 +57,26 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             @Override
             public void onClick(View v) {
                 carregarWebService();
+
             }
         });
+
+        btnEditar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                layout001.setVisibility(View.INVISIBLE);    layout01.setVisibility(View.INVISIBLE);
+                layout002.setVisibility(View.INVISIBLE);    layout02.setVisibility(View.INVISIBLE);
+                layout003.setVisibility(View.INVISIBLE);    layout03.setVisibility(View.INVISIBLE);
+
+                cpfEdit.setText(pegaCpf.getText().toString());
+                nomeEdit.setText(nome.getText().toString());
+                enderecoEdit.setText(endereco.getText().toString());
+                telefEdit.setText(telefone.getText().toString());
+
+
+            }
+        });
+
     }
 
     private void carregarWebService() {
@@ -63,6 +89,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
         jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
         request.add(jsonObjectReq);
+        btnEditar.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -91,9 +118,9 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             telefone.setText("Telefone: " + jsonObject.optString("telefone"));
 
 
-            nome.setVisibility(View.VISIBLE);
-            endereco.setVisibility(View.VISIBLE);
-            telefone.setVisibility(View.VISIBLE);
+            layout001.setVisibility(View.VISIBLE);
+            layout002.setVisibility(View.VISIBLE);
+            layout003.setVisibility(View.VISIBLE);
 
         } catch (JSONException e){
             e.printStackTrace();
