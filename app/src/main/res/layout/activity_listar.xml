@@ -52,7 +52,7 @@
 
         <RelativeLayout
             android:id="@+id/layout001"
-            android:visibility="invisible"
+
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="15dp"
@@ -204,7 +204,7 @@
                 />
 
             <EditText
-                android:id="@+id/editEmdereco"
+                android:id="@+id/editEndereco"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
