@@ -2,8 +2,10 @@ package com.example.maikon.crudandroid10;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,16 +15,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HurlStack;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ListarActivity extends AppCompatActivity implements Response.Listener<JSONObject>, Response.ErrorListener {
 
@@ -34,6 +43,9 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     JsonObjectRequest jsonObjectReq;
     RelativeLayout layout001, layout002, layout003,layout01, layout02, layout03, layout04;
     int controle;
+    Uri.Builder builder ;
+    StringRequest stringRequest;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +67,8 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
         layout003 = (RelativeLayout) findViewById(R.id.layout003); layout03 = (RelativeLayout) findViewById(R.id.layout3);
                                                                     layout04 = (RelativeLayout) findViewById(R.id.layout4);
 
-        request = Volley.newRequestQueue(ListarActivity.this);
+
+        request = Volley.newRequestQueue(ListarActivity.this, new HurlStack());
 
         butBuscar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -96,11 +109,18 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             progresso.setMessage("Carregando...");
             progresso.show();
 
-            String url = "http://10.0.2.2/webservices/consultarCurso.php?cpf="+pegaCpf.getText().toString()+" "; // armazena o caminho do webservice no servidor
-            url.replace(" ", "%20"); //trata os espacos na url - primeiro campo o que sera substituido, segundo pelo que
+            String url = "https://162.241.2.188/home3/ellegoco/webservice/consultarPessoa.php?cpf="+pegaCpf.getText().toString(); // armazena o caminho do webservice no servidor
 
-            jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
-            request.add(jsonObjectReq);
+
+                try {
+                    jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
+                    request.add(jsonObjectReq);
+                    System.out.print("resultado "+getHeaders());
+                }catch (AuthFailureError authFailureError) {
+                    authFailureError.printStackTrace();
+                }
+
+
             btnEditar.setVisibility(View.VISIBLE);
         }else{
             progresso = new ProgressDialog(this);
@@ -111,10 +131,30 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
                     +enderecoEdit.getText().toString() +"&telefone="+telefEdit.getText().toString(); // armazena o caminho do webservice no servidor
             url.replace(" ", "%20"); //trata os espacos na url - primeiro campo o que sera substituido, segundo pelo que
 
-            jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
-            request.add(jsonObjectReq);
+
+
+            try {
+                jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
+                request.add(jsonObjectReq);
+                getHeaders();
+            } catch (AuthFailureError authFailureError) {
+                authFailureError.printStackTrace();
+            }
 
         }
+
+    }
+
+
+
+    public Map<String, String> getHeaders() throws AuthFailureError {
+
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("Content-Type", "application/json");
+        String creds = String.format("%s:%s","ellegoco","@dedey123");
+        String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
+        params.put("Authorization", auth);
+        return params;
 
     }
 
@@ -122,11 +162,11 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     public void onErrorResponse(VolleyError error) {
         if (controle == 1){
             progresso.hide();
-            Toast.makeText(getApplicationContext(), "Não foi possível atualizar " + error.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Não foi possível atualizar " + error.toString(), Toast.LENGTH_LONG).show();
             Log.i("ERROR", error.toString());
         }else {
             progresso.hide();
-            Toast.makeText(getApplicationContext(), "Não foi possível efetuar a consulta " + error.toString(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Não foi possível efetuar a consulta " + error.toString(), Toast.LENGTH_LONG).show();
             Log.i("ERROR", error.toString());
         }
     }
