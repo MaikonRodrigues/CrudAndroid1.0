@@ -45,6 +45,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     int controle;
     Uri.Builder builder ;
     StringRequest stringRequest;
+    String userSenha;
 
 
     @Override
@@ -52,7 +53,7 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listar);
 
-        controle = 0;
+        controle = 0; userSenha = "ellegoco:@dedey123";
                                                                     cpfEdit      = (EditText) findViewById(R.id.editCpf);
         nome     = (TextView) findViewById(R.id.textViewNome);      nomeEdit     = (EditText) findViewById(R.id.editNome);
         endereco = (TextView) findViewById(R.id.textViewEndereco);  enderecoEdit = (EditText) findViewById(R.id.editEndereco);
@@ -112,13 +113,11 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
             String url = "https://162.241.2.188/home3/ellegoco/webservice/consultarPessoa.php?cpf="+pegaCpf.getText().toString(); // armazena o caminho do webservice no servidor
 
 
-                try {
+
                     jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
                     request.add(jsonObjectReq);
-                    System.out.print("resultado "+getHeaders());
-                }catch (AuthFailureError authFailureError) {
-                    authFailureError.printStackTrace();
-                }
+                   // System.out.print("resultado "+getHeaders());
+
 
 
             btnEditar.setVisibility(View.VISIBLE);
@@ -133,13 +132,10 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
 
 
-            try {
+
                 jsonObjectReq = new JsonObjectRequest(Request.Method.GET, url, null, this,this);
                 request.add(jsonObjectReq);
-                getHeaders();
-            } catch (AuthFailureError authFailureError) {
-                authFailureError.printStackTrace();
-            }
+
 
         }
 
@@ -147,14 +143,22 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
 
 
 
-    public Map<String, String> getHeaders() throws AuthFailureError {
+    public Map getHeaders() throws AuthFailureError {
 
+
+        /*
         HashMap<String, String> params = new HashMap<String, String>();
         params.put("Content-Type", "application/json");
         String creds = String.format("%s:%s","ellegoco","@dedey123");
         String auth = "Basic " + Base64.encodeToString(creds.getBytes(), Base64.DEFAULT);
         params.put("Authorization", auth);
         return params;
+        */
+
+        HashMap headers = new HashMap();
+        headers.put("Content-Type", "application/json");
+        headers.put("ellegoco", "@dedey123");
+        return headers;
 
     }
 
@@ -162,11 +166,11 @@ public class ListarActivity extends AppCompatActivity implements Response.Listen
     public void onErrorResponse(VolleyError error) {
         if (controle == 1){
             progresso.hide();
-            Toast.makeText(getApplicationContext(), "Não foi possível atualizar " + error.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Não foi possível atualizar " + error.toString(), Toast.LENGTH_SHORT).show();
             Log.i("ERROR", error.toString());
         }else {
             progresso.hide();
-            Toast.makeText(getApplicationContext(), "Não foi possível efetuar a consulta " + error.toString(), Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Não foi possível efetuar a consulta " + error.toString(), Toast.LENGTH_SHORT).show();
             Log.i("ERROR", error.toString());
         }
     }
